@@ -100,6 +100,29 @@
         "a28a7e1b-a969-445d-84eb-1518caee1241",
         "71ce60dc-6854-4f44-af0f-8e02644d8d58"
       ]
+    },
+    "a6ee43a4-3dcf-43e2-851b-7dc829b4edd7": {
+      "previousChats": [],
+      "titles": [],
+      "conversations": {
+        "2c6f5701-75e2-44a1-b6aa-531d465beb18": {
+          "id": "2c6f5701-75e2-44a1-b6aa-531d465beb18",
+          "title": "Chat 0",
+          "messages": [
+            {
+              "role": "user",
+              "content": "hi"
+            },
+            {
+              "role": "assistant",
+              "content": "Hello! How can I help you today?\n"
+            }
+          ]
+        }
+      },
+      "convOrder": [
+        "2c6f5701-75e2-44a1-b6aa-531d465beb18"
+      ]
     }
   }
 }
