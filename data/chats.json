@@ -1,0 +1,99 @@
+{
+  "clients": {
+    "c4516e7f-2c87-4515-b725-f18c428950f7": {
+      "previousChats": [],
+      "titles": [],
+      "conversations": {
+        "91224b3b-3bbb-4856-83d1-5d71879aadab": {
+          "id": "91224b3b-3bbb-4856-83d1-5d71879aadab",
+          "title": "Chat 0",
+          "messages": [
+            {
+              "role": "user",
+              "content": "hi"
+            },
+            {
+              "role": "assistant",
+              "content": "Hi there! How can I help you today?\n"
+            },
+            {
+              "role": "user",
+              "content": "what did i just ask"
+            },
+            {
+              "role": "assistant",
+              "content": "You just asked \"what did i just ask\".\n"
+            },
+            {
+              "role": "user",
+              "content": "funny"
+            },
+            {
+              "role": "assistant",
+              "content": "I'm glad you think so! I try my best. Is there anything else I can help you with?\n"
+            }
+          ]
+        },
+        "a7404373-b0e0-4ae6-817f-e32bda395f51": {
+          "id": "a7404373-b0e0-4ae6-817f-e32bda395f51",
+          "title": "Chat 1",
+          "messages": [
+            {
+              "role": "user",
+              "content": "what is math answer philosophically "
+            },
+            {
+              "role": "assistant",
+              "content": "That's a fascinating question that delves into the intersection of mathematics and philosophy! Here's a breakdown of what a \"mathematical answer\" might mean philosophically, and some related concepts:\n\n**1. The Nature of Truth and Knowledge in Math:**\n\n*   **Platonism vs. Constructivism:** The most fundamental question is whether mathematical truths *exist* independently of us (Platonism) or are *constructed* by us (Constructivism/Intuitionism).\n    *   **Platonism:** Math answers are true because they reflect a reality of abstract objects (numbers, sets, etc.) that exist independently of our minds. Finding a solution is like discovering something that was already there.  The answer is a \"fact\" about this abstract universe.  Think of it like discovering a new planet – it was there all along, we just didn't know it.\n    *   **Constructivism/Intuitionism:**  A mathematical answer is only"
+            }
+          ]
+        }
+      },
+      "convOrder": [
+        "91224b3b-3bbb-4856-83d1-5d71879aadab",
+        "a7404373-b0e0-4ae6-817f-e32bda395f51"
+      ]
+    },
+    "17a8802a-a507-466a-90bc-cb0c49c80610": {
+      "previousChats": [],
+      "titles": [],
+      "conversations": {
+        "a28a7e1b-a969-445d-84eb-1518caee1241": {
+          "id": "a28a7e1b-a969-445d-84eb-1518caee1241",
+          "title": "Chat 0",
+          "messages": [
+            {
+              "role": "user",
+              "content": "hi"
+            },
+            {
+              "role": "user",
+              "content": "hi"
+            },
+            {
+              "role": "user",
+              "content": "hi"
+            },
+            {
+              "role": "user",
+              "content": "hi"
+            },
+            {
+              "role": "assistant",
+              "content": "Hello there! How can I help you today?\n"
+            }
+          ]
+        },
+        "71ce60dc-6854-4f44-af0f-8e02644d8d58": {
+          "id": "71ce60dc-6854-4f44-af0f-8e02644d8d58",
+          "title": "Chat 1",
+          "messages": []
+        }
+      },
+      "convOrder": [
+        "a28a7e1b-a969-445d-84eb-1518caee1241",
+        "71ce60dc-6854-4f44-af0f-8e02644d8d58"
+      ]
+    }
+  }
+}
