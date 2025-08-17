@@ -33,7 +33,7 @@ async function apiFetch(path, options) {
 function App() {
   // Persistent client id per browser
   const [clientId] = useState(() => {
-    const key = "intellibot_clientId";
+    const key = "cognito_clientId";
     const existing = localStorage.getItem(key);
     if (existing) return existing;
     const id =
@@ -67,8 +67,8 @@ function App() {
 
   const persistLast = (id, title) => {
     try {
-      if (id) localStorage.setItem("intellibot_lastChatId", id);
-      if (title) localStorage.setItem("intellibot_lastTitle", title);
+      if (id) localStorage.setItem("cognito_lastChatId", id);
+      if (title) localStorage.setItem("cognito_lastTitle", title);
     } catch {}
   };
 
@@ -309,7 +309,7 @@ function App() {
         );
         if (Array.isArray(data.conversations)) {
           setConversations(data.conversations);
-          const savedId = localStorage.getItem("intellibot_lastChatId");
+          const savedId = localStorage.getItem("cognito_lastChatId");
           const chosen =
             data.conversations.find((c) => c.id === savedId) ||
             data.conversations.slice(-1)[0];
@@ -558,7 +558,7 @@ function App() {
       <section
         className={`main ${isPromptOpen || isDeletePromptOpen ? "blur" : ""}`}
       >
-        <h1 className="title">INTELLIBOT</h1>
+        <h1 className="title">COGNITO</h1>
         {isDefaultPage ? (
           <DefaultPage />
         ) : (
