@@ -3,10 +3,8 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 /* eslint-disable jsx-a11y/anchor-has-content */
 import React, { useRef, useEffect, useState } from "react";
-import "./App.css";
 import Modal from "react-modal";
 import DefaultPage from "./components/Default";
-import CoachPanel from "./components/CoachPanel";
 Modal.setAppElement("#root");
 
 // Helper for API base and safe JSON parsing
@@ -65,7 +63,6 @@ function App() {
   const [theme, setTheme] = useState("default");
   const [isThemeMenuOpen, setIsThemeMenuOpen] = useState(false);
   const [isActive, setIsActive] = useState(false);
-  const [showCoach, setShowCoach] = useState(false);
   const silenceTimeoutRef = useRef(null);
 
   const persistLast = (id, title) => {
@@ -494,9 +491,6 @@ function App() {
     <div className={`app ${theme}`}>
       <section className="side-bar">
         <button onClick={createNewChat}>+ New Conversation</button>
-        <button onClick={() => setShowCoach((s) => !s)}>
-          {showCoach ? "Close Coach" : "Open Coach"}
-        </button>
         <ul className="history">
           {conversations.map((c) => (
             <li key={c.id} onClick={() => handleClick(c.id)}>
@@ -508,7 +502,7 @@ function App() {
                     handleRename(c.id);
                   }}
                 >
-                  ✏️
+                  <img className="renameimg" alt="rename button" />
                 </button>
                 <span>{c.title}</span>
                 <button
@@ -518,27 +512,60 @@ function App() {
                     handleDeleteChat(c.id);
                   }}
                 >
-                  🗑️
+                  <img className="deleteimg" alt="delete button" />
                 </button>
               </div>
             </li>
           ))}
         </ul>
+        <div
+          id="circularMenu"
+          className={`circular-menu ${isActive ? "active" : ""}`}
+        >
+          <a className="floating-btn" onClick={toggleMenu}>
+            <i className="fa fa-plus"></i>
+          </a>
+
+          <menu className="items-wrapper">
+            <a
+              className={`dark menu-item fa fa-linkedin ${
+                theme === "dark" ? "active" : ""
+              }`}
+              onClick={() => handleThemeChange("dark")}
+            ></a>
+            <a
+              className={`light menu-item fa fa-linkedin ${
+                theme === "light" ? "active" : ""
+              }`}
+              onClick={() => handleThemeChange("light")}
+            ></a>
+            <a
+              className={`blue menu-item fa fa-linkedin ${
+                theme === "blue" ? "active" : ""
+              }`}
+              onClick={() => handleThemeChange("blue")}
+            ></a>
+            <a
+              className={`default menu-item fa fa-linkedin ${
+                theme === "default" ? "active" : ""
+              }`}
+              onClick={() => handleThemeChange("default")}
+            ></a>
+          </menu>
+        </div>
       </section>
 
       <section
         className={`main ${isPromptOpen || isDeletePromptOpen ? "blur" : ""}`}
       >
         <h1 className="title">COGNITO</h1>
-        {showCoach ? (
-          <CoachPanel onClose={() => setShowCoach(false)} />
-        ) : isDefaultPage ? (
+        {isDefaultPage ? (
           <DefaultPage />
         ) : (
           <ul className="feed">
             {previousChats.map((chatMessage, index) => (
               <li key={index}>
-                <div className={`message-container ${chatMessage?.role || ""}`}>
+                <div className="message-container">
                   {chatMessage && (
                     <div className="role-container">
                       <p className="role">{chatMessage.role}</p>
@@ -554,7 +581,11 @@ function App() {
                               }
                             }}
                           >
-                            {chatMessage.isSpeaking ? "🔇" : "🔈"}
+                            {chatMessage.isSpeaking ? (
+                              <img className="speak" alt="Stop" />
+                            ) : (
+                              <img className="speak" alt="Speak" />
+                            )}
                           </button>
                         )}
                     </div>
@@ -568,7 +599,7 @@ function App() {
                   ) : (
                     chatMessage &&
                     chatMessage.content && (
-                      <pre className="bubble">
+                      <pre>
                         <span>{chatMessage.content}</span>
                       </pre>
                     )
@@ -616,7 +647,7 @@ function App() {
             </div>
           </div>
 
-          <p className={"info"}>Made by Hussain</p>
+          <p className={"info"}>Made by Hussain, Rahmath</p>
         </div>
       </section>
 
