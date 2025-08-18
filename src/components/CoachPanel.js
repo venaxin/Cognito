@@ -239,41 +239,37 @@ export default function CoachPanel({ onClose }) {
   // No auth actions here; use AuthStatus in header
 
   return (
-    <div className="coach-panel" style={{ padding: 16 }}>
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-        }}
-      >
+    <div className="coach-panel">
+      <div className="coach-header">
         <h2>Learning Coach</h2>
-        <button onClick={onClose}>Close</button>
+        <button onClick={onClose} className="coach-close">
+          Close
+        </button>
       </div>
 
-      <section style={{ marginTop: 12, marginBottom: 16 }}>
+      <section className="coach-auth">
         {accessToken ? (
-          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+          <div className="coach-signed-in">
             <span>
               Signed in as {supaUser?.email || supaUser?.id || "user"}
             </span>
           </div>
         ) : null}
         {!accessToken && (
-          <div style={{ marginTop: 10 }}>
-            <p style={{ marginTop: 0 }}>
+          <div className="coach-dev-fallback">
+            <p>
               Please sign in using the “Sign in” button in the header. For local
               development, you can also use a dev userId fallback:
             </p>
-            <label style={{ display: "block" }}>Dev userId (fallback):</label>
+            <label className="coach-label">Dev userId (fallback)</label>
             <input
-              style={{ width: "100%" }}
+              className="coach-input"
               value={userId}
               onChange={(e) => setUserId(e.target.value)}
               placeholder="Paste your test user's UUID"
             />
             {!userId && (
-              <p style={{ color: "#c00" }}>
+              <p className="coach-warning">
                 Sign in above or enter a userId to use these features.
               </p>
             )}
@@ -281,15 +277,8 @@ export default function CoachPanel({ onClose }) {
         )}
       </section>
 
-      <section
-        style={{
-          display: "grid",
-          gap: 16,
-          gridTemplateColumns: "1fr 1fr",
-          alignItems: "start",
-        }}
-      >
-        <div>
+      <section className="coach-grid">
+        <div className="coach-section">
           <h3>Create Goal</h3>
           <form onSubmit={createGoal}>
             <input
@@ -314,7 +303,7 @@ export default function CoachPanel({ onClose }) {
               Add Goal
             </button>
           </form>
-          <ul>
+          <ul className="coach-list">
             {goals.map((g) => (
               <li key={g.id}>
                 {g.title} {g.target_date ? `– due ${g.target_date}` : ""}
@@ -323,7 +312,7 @@ export default function CoachPanel({ onClose }) {
           </ul>
         </div>
 
-        <div>
+        <div className="coach-section">
           <h3>Create Deck</h3>
           <form onSubmit={createDeck}>
             <input
@@ -342,8 +331,8 @@ export default function CoachPanel({ onClose }) {
               Add Deck
             </button>
           </form>
-          <div style={{ marginTop: 8 }}>
-            <label>Selected deck: </label>
+          <div className="coach-select-deck">
+            <label className="coach-label">Selected deck</label>
             <select
               className="coach-select"
               value={selectedDeckId}
@@ -360,16 +349,8 @@ export default function CoachPanel({ onClose }) {
         </div>
       </section>
 
-      <section
-        style={{
-          display: "grid",
-          gap: 16,
-          gridTemplateColumns: "1fr 1fr",
-          alignItems: "start",
-          marginTop: 16,
-        }}
-      >
-        <div>
+      <section className="coach-grid">
+        <div className="coach-section">
           <h3>Create Card</h3>
           <form onSubmit={createCard}>
             <textarea
@@ -391,84 +372,110 @@ export default function CoachPanel({ onClose }) {
               Add Card
             </button>
           </form>
-          <p style={{ fontSize: 12, opacity: 0.7 }}>
+          <p className="coach-note">
             Embeddings are computed server-side if your API_KEY is set.
           </p>
         </div>
 
-        <div>
+        <div className="coach-section">
           <h3>Study</h3>
           {!selectedDeckId ? (
-            <p>Select a deck to see due cards.</p>
+            <p className="coach-empty">Select a deck to see due cards.</p>
           ) : (
             <>
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  marginBottom: 8,
-                }}
-              >
-                <div style={{ fontSize: 14, opacity: 0.9 }}>
-                  Due now: <b>{dueCards.length}</b>{" "}
-                  {stats.dueCount !== dueCards.length
-                    ? `(total due: ${stats.dueCount})`
-                    : ""}
-                </div>
-                <div style={{ fontSize: 12, opacity: 0.8 }}>
-                  Today: {stats.todayReviewed} • Streak: {stats.streakDays}d
-                </div>
-              </div>
+              {(() => {
+                const sessionTotal = Math.max(
+                  stats.dueCount || 0,
+                  dueCards.length
+                );
+                const completed = Math.max(0, sessionTotal - dueCards.length);
+                const pct = sessionTotal
+                  ? Math.round((completed / sessionTotal) * 100)
+                  : 0;
+                return (
+                  <div className="coach-stats">
+                    <div className="coach-badges">
+                      <span className="coach-badge">
+                        Due now: {dueCards.length}
+                      </span>
+                      {stats.dueCount !== dueCards.length && (
+                        <span className="coach-badge subtle">
+                          Total due: {stats.dueCount}
+                        </span>
+                      )}
+                      <span className="coach-badge subtle">
+                        Today: {stats.todayReviewed}
+                      </span>
+                      <span className="coach-badge subtle">
+                        Streak: {stats.streakDays}d
+                      </span>
+                    </div>
+                    <div
+                      className="coach-progress"
+                      aria-label={`Progress ${pct}%`}
+                    >
+                      <div
+                        className="coach-progress-bar"
+                        style={{ width: `${pct}%` }}
+                      />
+                    </div>
+                  </div>
+                );
+              })()}
 
               {dueCards.length === 0 ? (
-                <p>No due cards. Add some cards or try again later.</p>
+                <p className="coach-empty">
+                  No due cards. Add some cards or try again later.
+                </p>
               ) : (
                 (() => {
                   const c = dueCards[currentIndex] || dueCards[0];
                   if (!c) return null;
                   return (
-                    <div
-                      key={c.id}
-                      style={{
-                        border: "1px solid #ccc",
-                        borderRadius: 6,
-                        padding: 12,
-                        marginBottom: 8,
-                      }}
-                    >
-                      <div>
-                        <b>Front:</b>
-                        <br />
-                        {c.front}
+                    <div key={c.id} className="coach-card">
+                      <div className="coach-card-front">
+                        <div className="coach-card-label">Front</div>
+                        <div className="coach-card-text">{c.front}</div>
                       </div>
-                      {showAnswer ? (
-                        <div style={{ marginTop: 8 }}>
-                          <b>Back:</b>
-                          <br />
-                          {c.back}
+                      {showAnswer && (
+                        <div className="coach-card-back">
+                          <div className="coach-card-label">Back</div>
+                          <div className="coach-card-text">{c.back}</div>
                         </div>
-                      ) : null}
+                      )}
 
                       {!showAnswer ? (
-                        <div style={{ marginTop: 12 }}>
+                        <div className="coach-actions">
                           <button onClick={() => setShowAnswer(true)}>
                             Show answer
                           </button>
                         </div>
                       ) : (
-                        <div
-                          style={{
-                            marginTop: 12,
-                            display: "flex",
-                            gap: 8,
-                            flexWrap: "wrap",
-                          }}
-                        >
-                          <button onClick={() => review(c.id, 0)}>Again</button>
-                          <button onClick={() => review(c.id, 2)}>Hard</button>
-                          <button onClick={() => review(c.id, 4)}>Good</button>
-                          <button onClick={() => review(c.id, 5)}>Easy</button>
+                        <div className="coach-actions">
+                          <button
+                            className="rating-again"
+                            onClick={() => review(c.id, 0)}
+                          >
+                            Again
+                          </button>
+                          <button
+                            className="rating-hard"
+                            onClick={() => review(c.id, 2)}
+                          >
+                            Hard
+                          </button>
+                          <button
+                            className="rating-good"
+                            onClick={() => review(c.id, 4)}
+                          >
+                            Good
+                          </button>
+                          <button
+                            className="rating-easy"
+                            onClick={() => review(c.id, 5)}
+                          >
+                            Easy
+                          </button>
                         </div>
                       )}
                     </div>

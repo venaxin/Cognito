@@ -78,3 +78,140 @@
   min-height: 80px;
   resize: vertical;
 }
+
+/* Coach modal layout */
+.coach-panel {
+  padding: 16px;
+}
+.coach-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+.coach-close {
+  background: transparent;
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 6px 10px;
+}
+.coach-auth {
+  margin: 8px 0 16px;
+}
+.coach-dev-fallback .coach-warning {
+  color: #ffb3b3;
+}
+.coach-label {
+  display: block;
+  margin: 8px 0 4px;
+  font-size: 12px;
+  opacity: 0.8;
+}
+.coach-grid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: 1fr 1fr;
+  align-items: start;
+}
+.coach-section h3 {
+  margin-top: 0;
+}
+.coach-list {
+  margin-top: 8px;
+}
+.coach-select-deck {
+  margin-top: 8px;
+}
+
+/* Study stats and progress */
+.coach-stats {
+  margin-bottom: 8px;
+}
+.coach-badges {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-bottom: 6px;
+}
+.coach-badge {
+  font-size: 12px;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: #0c1420;
+  border: 1px solid #1d2734;
+}
+.coach-badge.subtle {
+  opacity: 0.8;
+}
+.coach-progress {
+  position: relative;
+  height: 8px;
+  background: #0c1420;
+  border: 1px solid #1d2734;
+  border-radius: 999px;
+  overflow: hidden;
+}
+.coach-progress-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, #4ade80, #22c55e);
+}
+.coach-empty {
+  opacity: 0.85;
+}
+
+/* Study card */
+.coach-card {
+  border: 1px solid #1d2734;
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 8px;
+  background: #0b1220;
+}
+.coach-card-label {
+  font-size: 11px;
+  opacity: 0.7;
+  margin-bottom: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.coach-card-text {
+  white-space: pre-wrap;
+}
+.coach-card-back {
+  margin-top: 10px;
+  border-top: 1px dashed #1d2734;
+  padding-top: 10px;
+}
+.coach-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+}
+.coach-actions .rating-again {
+  background-image: none;
+  background: #ef4444;
+}
+.coach-actions .rating-hard {
+  background-image: none;
+  background: #f59e0b;
+}
+.coach-actions .rating-good {
+  background-image: none;
+  background: #22c55e;
+}
+.coach-actions .rating-easy {
+  background-image: none;
+  background: #3b82f6;
+}
+
+@media (max-width: 860px) {
+  .coach-grid {
+    grid-template-columns: 1fr;
+  }
+}
