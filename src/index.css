@@ -62,7 +62,11 @@
   --textarea-color: rgb(0, 0, 0);
   --feed-li: rgb(103, 211, 247);
   --newchat: linear-gradient(to right, #3175fcd7 0%, rgb(103, 211, 247) 100%);
-  --newchat-hover: linear-gradient(to left,#3175fcd7 0%,rgb(103, 211, 247) 100%);
+  --newchat-hover: linear-gradient(
+    to left,
+    #3175fcd7 0%,
+    rgb(103, 211, 247) 100%
+  );
   --textsmoke-color: rgb(227, 226, 226);
   --historylihover-color: #467ff0d7;
   --historyli-color: rgb(25, 179, 231);
@@ -126,7 +130,15 @@ body {
   font-size: 55px;
   margin-top: 50px;
   padding-bottom: 0px;
-  background: linear-gradient( to right, var(--title-color1), var(--title-color2), var(--title-color), var(--title-color1), var(--title-color2), var(--title-color) );
+  background: linear-gradient(
+    to right,
+    var(--title-color1),
+    var(--title-color2),
+    var(--title-color),
+    var(--title-color1),
+    var(--title-color2),
+    var(--title-color)
+  );
   background-clip: text;
   -webkit-background-clip: text;
   color: transparent;
@@ -169,11 +181,11 @@ body {
   height: 100vh;
   font-family: "Narnoor";
   display: grid;
-  grid-template-rows: 10vh 75vh 10vh 1vh;;
+  grid-template-rows: 10vh 75vh 10vh 1vh;
   /* flex-direction: column; */
   /* justify-content: space-between; */
   align-items: center;
-  flex:  1;
+  flex: 1;
 }
 
 button {
@@ -229,11 +241,10 @@ button:active {
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
-button:focus {
-  outline: none;
-}
+/* Avoid removing focus outlines globally for accessibility */
+/* If needed, add a specific class and style that instead */
 
-nav {
+.bottom-section nav {
   border-top: solid 0.5px rgba(225, 225, 225, 0.5);
   padding: 10px;
   margin: 10px;
@@ -263,7 +274,7 @@ nav {
   display: flex;
   align-items: center;
 }
-textarea {
+#input {
   font-family: "Ysabeau+SC", sans-serif;
   position: absolute;
   bottom: 0%;
@@ -282,28 +293,26 @@ textarea {
     rgba(0, 0, 0, 0.05) 0 4px 6px, rgba(0, 0, 0, 0.05) 0 12px 3px,
     rgba(0, 0, 0, 0.05) 0 -3px 5px;
   animation: pulse 1.5s infinite;
-  z-index: 1;
+  /* z-index: 1; */
   color: var(--textarea-color);
 }
-textarea {
+#input {
   transition: opacity 1s ease-in-out;
 }
-textarea:hover {
+#input:hover {
   cursor: text;
   color: var(--textarea-color);
   background-color: var(--textarea-backgroud);
   box-shadow: 0 15px 20px rgba(0, 0, 0, 0.2);
 }
-
-textarea:focus,
-textarea:not(:placeholder-shown) {
+#input:focus,
+#input:not(:placeholder-shown) {
   opacity: 1;
 }
-
-textarea::placeholder {
+#input::placeholder {
   color: var(--placeholder);
 }
-textarea::-webkit-scrollbar {
+#input::-webkit-scrollbar {
   display: none;
 }
 
@@ -429,11 +438,10 @@ textarea::-webkit-scrollbar {
   text-align: center;
   height: 100%;
   display: grid;
-  
 }
-.welcome{
+.welcome {
   grid-row: 1;
-  max-height:45%
+  max-height: 45%;
 }
 .default-container p {
   color: var(--default-container);
@@ -749,16 +757,18 @@ input::placeholder {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  background-color: rgba(0, 0, 0, 0.35);
-  width: 400px;
-  height: 200px;
+  background-color: rgba(0, 0, 0, 0.85);
+  width: 90vw;
+  max-width: 960px;
+  max-height: 90vh;
   padding: 20px;
   border-radius: 10px;
-  text-align: center;
+  text-align: left;
+  overflow: auto;
 }
 
 .custom-modal-overlay {
-  background-color: rgba(0, 0, 0, 0.05);
+  background-color: rgba(0, 0, 0, 0.5);
 }
 
 .custom-modal h2 {
@@ -961,4 +971,3 @@ input::placeholder {
 .items-wrapper .default {
   background-image: linear-gradient(0deg, #d9afd9 7%, #97d9e1 93%);
 }
-

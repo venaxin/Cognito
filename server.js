@@ -312,8 +312,35 @@ function requireSupabase(res) {
   return true;
 }
 
-function getUserId(req) {
-  return req.header("x-user-id") || req.body?.userId || req.query?.userId;
+// Auth helpers: prefer Supabase JWT in Authorization: Bearer <token>
+async function getAuthUser(req) {
+  try {
+    const auth = req.header("authorization") || req.header("Authorization");
+    if (!auth) return null;
+    const parts = auth.split(" ");
+    if (parts.length !== 2 || parts[0].toLowerCase() !== "bearer") return null;
+    const token = parts[1];
+    const { data, error } = await sbAdmin.auth.getUser(token);
+    if (error || !data?.user) return null;
+    return { id: data.user.id, token };
+  } catch (e) {
+    console.warn("getAuthUser error:", e?.message || e);
+    return null;
+  }
+}
+
+async function requireUser(req, res) {
+  if (!requireSupabase(res)) return null;
+  const u = await getAuthUser(req);
+  if (u && u.id) return u.id;
+  // Dev fallback to x-user-id if no Authorization header and not production
+  const devId =
+    req.header("x-user-id") || req.body?.userId || req.query?.userId;
+  if (devId && process.env.NODE_ENV !== "production") return devId;
+  res.status(401).send({
+    error: "Unauthorized: provide Supabase JWT in Authorization header",
+  });
+  return null;
 }
 
 function addDays(date, days) {
@@ -366,10 +393,10 @@ async function computeEmbeddingOrNull(text) {
 // Create goal
 app.post("/coach/goal", async (req, res) => {
   if (!requireSupabase(res)) return;
-  const userId = getUserId(req);
+  const userId = await requireUser(req, res);
+  if (!userId) return;
   const { title, description, targetDate } = req.body || {};
-  if (!userId || !title)
-    return res.status(400).send({ error: "userId and title required" });
+  if (!title) return res.status(400).send({ error: "title required" });
   const { data, error } = await sbAdmin
     .from("goals")
     .insert([
@@ -384,8 +411,8 @@ app.post("/coach/goal", async (req, res) => {
 // List goals
 app.get("/coach/goals", async (req, res) => {
   if (!requireSupabase(res)) return;
-  const userId = getUserId(req);
-  if (!userId) return res.status(400).send({ error: "userId required" });
+  const userId = await requireUser(req, res);
+  if (!userId) return;
   const { data, error } = await sbAdmin
     .from("goals")
     .select("*")
@@ -398,10 +425,10 @@ app.get("/coach/goals", async (req, res) => {
 // Create deck
 app.post("/coach/deck", async (req, res) => {
   if (!requireSupabase(res)) return;
-  const userId = getUserId(req);
+  const userId = await requireUser(req, res);
+  if (!userId) return;
   const { title, description } = req.body || {};
-  if (!userId || !title)
-    return res.status(400).send({ error: "userId and title required" });
+  if (!title) return res.status(400).send({ error: "title required" });
   const { data, error } = await sbAdmin
     .from("decks")
     .insert([{ user_id: userId, title, description }])
@@ -414,8 +441,8 @@ app.post("/coach/deck", async (req, res) => {
 // List decks
 app.get("/coach/decks", async (req, res) => {
   if (!requireSupabase(res)) return;
-  const userId = getUserId(req);
-  if (!userId) return res.status(400).send({ error: "userId required" });
+  const userId = await requireUser(req, res);
+  if (!userId) return;
   const { data, error } = await sbAdmin
     .from("decks")
     .select("*")
@@ -428,12 +455,11 @@ app.get("/coach/decks", async (req, res) => {
 // Create card (compute embedding server-side)
 app.post("/coach/card", async (req, res) => {
   if (!requireSupabase(res)) return;
-  const userId = getUserId(req);
+  const userId = await requireUser(req, res);
+  if (!userId) return;
   const { deckId, front, back } = req.body || {};
-  if (!userId || !deckId || !front || !back)
-    return res
-      .status(400)
-      .send({ error: "userId, deckId, front, back required" });
+  if (!deckId || !front || !back)
+    return res.status(400).send({ error: "deckId, front, back required" });
   // Ensure deck belongs to user
   const { data: deck, error: deckErr } = await sbAdmin
     .from("decks")
@@ -463,11 +489,11 @@ app.post("/coach/card", async (req, res) => {
 // Study queue: due cards for user+deck
 app.get("/coach/study", async (req, res) => {
   if (!requireSupabase(res)) return;
-  const userId = getUserId(req);
+  const userId = await requireUser(req, res);
+  if (!userId) return;
   const deckId = req.query.deckId;
   const limit = Math.min(parseInt(req.query.limit || "10", 10), 50);
-  if (!userId || !deckId)
-    return res.status(400).send({ error: "userId and deckId required" });
+  if (!deckId) return res.status(400).send({ error: "deckId required" });
 
   // Fetch cards in deck
   const { data: cards, error: cardsErr } = await sbAdmin
@@ -511,12 +537,11 @@ app.get("/coach/study", async (req, res) => {
 // Submit a review
 app.post("/coach/review", async (req, res) => {
   if (!requireSupabase(res)) return;
-  const userId = getUserId(req);
+  const userId = await requireUser(req, res);
+  if (!userId) return;
   const { cardId, rating } = req.body || {};
-  if (!userId || !cardId || typeof rating !== "number")
-    return res
-      .status(400)
-      .send({ error: "userId, cardId, numeric rating required" });
+  if (!cardId || typeof rating !== "number")
+    return res.status(400).send({ error: "cardId, numeric rating required" });
 
   // Get last review
   const { data: prevs, error: prevErr } = await sbAdmin
@@ -549,6 +574,105 @@ app.post("/coach/review", async (req, res) => {
     .single();
   if (error) return res.status(500).send({ error: error.message });
   res.send({ review: data });
+});
+
+// Deck stats: due count, today's reviews, simple daily streak (deck-specific)
+app.get("/coach/stats", async (req, res) => {
+  if (!requireSupabase(res)) return;
+  const userId = await requireUser(req, res);
+  if (!userId) return;
+  const deckId = req.query.deckId;
+  if (!deckId) return res.status(400).send({ error: "deckId required" });
+
+  // Fetch card ids in the deck
+  const { data: cards, error: cardsErr } = await sbAdmin
+    .from("cards")
+    .select("id")
+    .eq("deck_id", deckId);
+  if (cardsErr) return res.status(500).send({ error: cardsErr.message });
+  const cardIds = (cards || []).map((c) => c.id);
+  if (!cardIds.length)
+    return res.send({ dueCount: 0, todayReviewed: 0, streakDays: 0 });
+
+  // Latest reviews per card for due calc
+  const { data: reviews, error: revErr } = await sbAdmin
+    .from("reviews")
+    .select("card_id, rating, interval_days, easiness, due_date, reviewed_at")
+    .eq("user_id", userId)
+    .in("card_id", cardIds);
+  if (revErr) return res.status(500).send({ error: revErr.message });
+
+  const latestByCard = new Map();
+  (reviews || []).forEach((r) => {
+    const prev = latestByCard.get(r.card_id);
+    if (!prev || new Date(r.reviewed_at) > new Date(prev.reviewed_at)) {
+      latestByCard.set(r.card_id, r);
+    }
+  });
+  const todayStr = new Date().toISOString().slice(0, 10);
+  const dueCount = cardIds.filter((id) => {
+    const lr = latestByCard.get(id);
+    if (!lr) return true; // never reviewed
+    return lr.due_date <= todayStr;
+  }).length;
+
+  // Today reviewed count (deck-specific)
+  const today = new Date();
+  const start = new Date(
+    Date.UTC(
+      today.getUTCFullYear(),
+      today.getUTCMonth(),
+      today.getUTCDate(),
+      0,
+      0,
+      0
+    )
+  );
+  const end = new Date(
+    Date.UTC(
+      today.getUTCFullYear(),
+      today.getUTCMonth(),
+      today.getUTCDate() + 1,
+      0,
+      0,
+      0
+    )
+  );
+  const { count: todayReviewed, error: todayErr } = await sbAdmin
+    .from("reviews")
+    .select("id", { count: "exact", head: true })
+    .eq("user_id", userId)
+    .in("card_id", cardIds)
+    .gte("reviewed_at", start.toISOString())
+    .lt("reviewed_at", end.toISOString());
+  if (todayErr) return res.status(500).send({ error: todayErr.message });
+
+  // Streak days (consecutive days ending today with >= 1 review)
+  const since = new Date();
+  since.setUTCDate(since.getUTCDate() - 60); // look back up to 60 days
+  const { data: recent, error: recentErr } = await sbAdmin
+    .from("reviews")
+    .select("reviewed_at")
+    .eq("user_id", userId)
+    .in("card_id", cardIds)
+    .gte("reviewed_at", since.toISOString());
+  if (recentErr) return res.status(500).send({ error: recentErr.message });
+  const datesSet = new Set(
+    (recent || []).map((r) =>
+      new Date(r.reviewed_at).toISOString().slice(0, 10)
+    )
+  );
+  let streakDays = 0;
+  let cursor = new Date(
+    Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate())
+  );
+  // Require today to have at least one review to start a streak
+  while (datesSet.has(cursor.toISOString().slice(0, 10))) {
+    streakDays += 1;
+    cursor.setUTCDate(cursor.getUTCDate() - 1);
+  }
+
+  res.send({ dueCount, todayReviewed: todayReviewed || 0, streakDays });
 });
 
 // In local/standalone mode, also serve the static React build and start listening

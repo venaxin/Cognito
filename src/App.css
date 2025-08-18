@@ -36,3 +36,45 @@
     transform: rotate(360deg);
   }
 }
+
+/* Modal styles used by react-modal */
+.custom-modal {
+  background: #111825;
+  border: 1px solid #1d2734;
+  color: #e6eef7;
+  padding: 16px;
+  max-width: 420px;
+  margin: auto;
+  border-radius: 10px;
+}
+.custom-modal-overlay {
+  background: rgba(0, 0, 0, 0.5);
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+}
+.custom-modal-wide {
+  max-width: 960px;
+  width: 90vw;
+  max-height: 90vh;
+  overflow: auto;
+}
+
+/* Coach panel form elements */
+.coach-input,
+.coach-select,
+.coach-textarea {
+  width: 100%;
+  display: block;
+  margin: 6px 0;
+  padding: 8px 10px;
+  border-radius: 6px;
+  border: 1px solid #1d2734;
+  background: #0c1420;
+  color: #e6eef7;
+}
+.coach-textarea {
+  min-height: 80px;
+  resize: vertical;
+}

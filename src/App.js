@@ -3,8 +3,11 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 /* eslint-disable jsx-a11y/anchor-has-content */
 import React, { useRef, useEffect, useState } from "react";
+import "./App.css";
 import Modal from "react-modal";
 import DefaultPage from "./components/Default";
+import CoachPanel from "./components/CoachPanel";
+import AuthStatus from "./components/AuthStatus";
 Modal.setAppElement("#root");
 
 // Helper for API base and safe JSON parsing
@@ -63,6 +66,7 @@ function App() {
   const [theme, setTheme] = useState("default");
   const [isThemeMenuOpen, setIsThemeMenuOpen] = useState(false);
   const [isActive, setIsActive] = useState(false);
+  const [showCoach, setShowCoach] = useState(false);
   const silenceTimeoutRef = useRef(null);
 
   const persistLast = (id, title) => {
@@ -491,6 +495,9 @@ function App() {
     <div className={`app ${theme}`}>
       <section className="side-bar">
         <button onClick={createNewChat}>+ New Conversation</button>
+        <button onClick={() => setShowCoach((s) => !s)}>
+          {showCoach ? "Close Coach" : "Open Coach"}
+        </button>
         <ul className="history">
           {conversations.map((c) => (
             <li key={c.id} onClick={() => handleClick(c.id)}>
@@ -558,7 +565,12 @@ function App() {
       <section
         className={`main ${isPromptOpen || isDeletePromptOpen ? "blur" : ""}`}
       >
-        <h1 className="title">COGNITO</h1>
+        <div className="title">
+          <h1 style={{ margin: 0 }}>COGNITO</h1>
+          <div style={{ marginLeft: "auto" }}>
+            <AuthStatus />
+          </div>
+        </div>
         {isDefaultPage ? (
           <DefaultPage />
         ) : (
@@ -650,6 +662,16 @@ function App() {
           <p className={"info"}>Made by Hussain, Rahmath</p>
         </div>
       </section>
+
+      {/* Coach modal overlay */}
+      <Modal
+        isOpen={showCoach}
+        onRequestClose={() => setShowCoach(false)}
+        className="custom-modal custom-modal-wide"
+        overlayClassName="custom-modal-overlay"
+      >
+        <CoachPanel onClose={() => setShowCoach(false)} />
+      </Modal>
 
       <Modal
         isOpen={isPromptOpen}
